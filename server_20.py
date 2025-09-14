@@ -22,6 +22,8 @@ print("Context received")
 
 num_chunks = len(database_chunks)
 
+
+
 for i in range(num_chunks):
     query_bytes = cm.recv_msg(conn)
     query_enc = ts.ckks_vector_from(context, query_bytes)

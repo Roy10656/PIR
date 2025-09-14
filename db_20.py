@@ -1,7 +1,7 @@
 import random
 
-n = 20
-chunk_size = 16384
+n = 25
+chunk_size = 16384 // 2
 
 database = [0] * (2**n)
 
@@ -15,5 +15,6 @@ def create_database_chunks():
     for i in range(0, len(database), chunk_size):
         chunk = database[i:i + chunk_size]
         chunks.append(chunk)
+
     
     return chunks

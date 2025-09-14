@@ -43,7 +43,7 @@ Usage
 
 Project Structure
 
-text
+PIR
 .
 ├── client_20.py   # PIR client logic
 ├── server_20.py   # PIR server logic

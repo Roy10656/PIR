@@ -5,15 +5,16 @@ import comm as cm
 
 database = db_20.create_database_chunks()
 
-n = 20
-chunk_size = 16384
-num_chunks = 2**(n - 14)  # 64 chunks
+n = 25
+chunk_size = 16384 // 2
+num_chunks = 2**n // chunk_size  # Equals 128 for n=20, chunk_size=8192
+
 
 desired_index = 1023  # your target index
 
 context = ts.context(
     ts.SCHEME_TYPE.CKKS,
-    poly_modulus_degree=32768,
+    poly_modulus_degree=32768 // 2,
     coeff_mod_bit_sizes=[60, 40, 40, 60]
 )
 context.global_scale = 2**40
@@ -24,7 +25,7 @@ query_chunks = []
 for chunk_idx in range(num_chunks):
     query_chunk = [0] * chunk_size
     start_idx = chunk_idx * chunk_size
-    if start_idx <= desired_index < start_idx + chunk_size:
+    if start_idx <= desired_index and desired_index < start_idx + chunk_size:
         query_chunk[desired_index - start_idx] = 1
     query_chunks.append(query_chunk)
 
@@ -51,6 +52,7 @@ for idx, enc_chunk in enumerate(query_enc_chunks):
     decrypted_val = round(response_enc.decrypt()[0])
     responses.append(decrypted_val)
     print(f"Client: Received response {idx+1}")
+
 
 # result = sum(responses)
 
