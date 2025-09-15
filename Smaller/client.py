@@ -1,7 +1,7 @@
 import tenseal as ts
 import socket
-import db
-import comm as cm
+import Smaller.db as db
+import Utils.comm as cm
 
 # load database
 database = db.create_database(db.database)
