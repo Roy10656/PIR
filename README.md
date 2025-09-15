@@ -1,59 +1,93 @@
 CKKS PIR Python Demo
 
-A research-driven Python project demonstrating Private Information Retrieval (PIR) using the CKKS homomorphic encryption scheme via the TenSEAL library. This client-server system enables privacy-preserving queries over large, chunked databases.
+A research-driven Python project demonstrating Private Information Retrieval (PIR) based on the CKKS homomorphic encryption scheme using the TenSEAL library. This client-server system allows privacy-preserving queries over a massive, chunked database—each server-client interaction is conducted securely, ensuring the query and data remain private.
 Features
 
-    CKKS-based PIR: Secure query and retrieval without revealing query contents.
+    CKKS PIR Protocol: Query and retrieve database entries securely without disclosing the query index to the server.
 
-Chunked Database Model: Splits large databases (220220 entries) into manageable memory chunks.
+    Chunked Database Model: Database entries (up to 232232) are divided into fixed-size chunks stored as .pkl files for efficient memory usage.
 
-Socket Communication: Length-prefixed messaging for robust data transfer.
+    Socket Communication: Length-prefixed messaging using custom helpers for robust transmission of serialized ciphertexts.
 
-Modular Structure: Separate modules for database, communication, client, and server logic.
+    Modular Structure: Separate modules for database generation, socket communication, and PIR client/server orchestration.
+
 File Overview
-File	Purpose
-client_20.py	Client: generates query, encrypts, sends, decrypts
-server_20.py	Server: receives query, processes, returns result
-db_20.py	Database: initializes and chunks database
-comm.py	Communication: socket send/receive helpers
+
+File	        Purpose
+client_max.py	PIR client: query construction, encryption, communication, decryption, response verification
+server_max.py	PIR server: query reception, homomorphic processing, response encryption
+db_pkl.py	    Database creation, chunking, loading utilities
+comm.py	        Socket send/receive helpers (serialize, message framing)
+
+
 Getting Started
 
-    Install Python & TenSEAL
+Install Python & TenSEAL:
 
-bash
-pip install tenseal
+    pip install tenseal
 
-Start Server
+Database Preparation:   
+Run db_pkl.py to generate database chunks (default: 232232 entries, chunk size: 8192). Chunks will be saved in db_chunks/.
 
-bash
-python server_20.py
+    python db_pkl.py
 
-Run Client (new terminal)
+Start the Server:
 
-    bash
-    python client_20.py
+    python server_max.py
 
-Usage
+Run the Client (in a new terminal):
 
-    Change the desired_index in client_20.py to retrieve different entries from the database.
 
-    Both server and client must use the same chunk size/database size configuration for correct operation.
+    python client_max.py
 
-    Output confirms decryption and checks correctness against the database entry.
+Usage :     
+Edit desired_index in client_max.py to retrieve a specific database entry.
+
+Ensure both client and server use consistent parameters: database total size, chunk size, port, and polynomial modulus degree.
+
+Output on client checks decrypted value against original database for correctness.
 
 Project Structure
 
-PIR
-.
-├── client_20.py   # PIR client logic
-├── server_20.py   # PIR server logic
-├── db_20.py       # Database creation & chunking
-└── comm.py        # Socket utilities
+
+    PIR/
+    ├── client_max.py      # PIR client logic
+    ├── server_max.py      # PIR server logic
+    ├── db_pkl.py          # Database creation & chunk utils
+    ├── Utils/comm.py      # Socket communication helpers
+    ├── db_chunks/(.pkl)   # Generated database chunk files 
 
 In Development
 
-    Performance optimizations for larger database sizes and parallel queries.
+    Improved performance and scalability for databases with up to 2^32 (429,49,67,296) entries. Chunked processing enables privacy-preserving queries on very large datasets using standard hardware resources.
 
-    Distinction between demo and production settings.
+    Multi-client support and advanced error handling.
 
-    Improved error handling and support for multi-client queries.
+    Separation of demo versus production configuration.
+
+Future Development
+
+Efficiency Enhancements: Current database creation (for 232232 entries) requires 2–3 hours; client-server data transmission typically takes 15+ hours on an Intel i5 (12th Gen) CPU with 8GB RAM—reflecting disk-based chunking and serialization bottlenecks.
+
+Optimized Storage Utilization: The system intentionally uses disk storage for dataset chunking/loading, minimizing RAM consumption and enabling scaling on consumer hardware.
+
+Planned Improvements:
+
+Parallelized chunk generation and client-server communication to reduce database generation and query response times.
+
+Batch PIR and query hoisting techniques to accelerate ciphertext operations and minimize communication overhead.
+
+More efficient serialization and chunk loading, possibly using memory-mapped files or advanced database formats for storage.
+
+Support for multi-threaded encryption/decryption and response aggregation for high-throughput scenarios.
+
+Investigating sublinear PIR schemes and preprocessing optimizations specifically tailored for disk-based chunk architecture.
+
+Detailed benchmarks for hardware resource usage (CPU, disk, RAM) and targeted bottleneck mitigation, with an aim to reduce runtimes by an order of magnitude.
+
+
+Notes
+
+    Chunk size and poly_modulus_degree must be carefully chosen to fit hardware constraints.
+
+    Demo parameters can be adjusted for experimentation, while production should benchmark for large-scale PIR settings.
